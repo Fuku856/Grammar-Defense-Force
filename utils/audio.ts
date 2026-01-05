@@ -8,14 +8,16 @@ class AudioController {
   private bgmNoteIndex: number = 0;
 
   constructor() {
-    try {
-      // Defer creation until interaction if needed, but we'll try init
-      const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
-      if (AudioContextClass) {
-        this.ctx = new AudioContext();
+    // Safety check for SSR/Build environments where window is undefined
+    if (typeof window !== 'undefined') {
+      try {
+        const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
+        if (AudioContextClass) {
+          this.ctx = new AudioContext();
+        }
+      } catch (e) {
+        console.error("Audio API not supported");
       }
-    } catch (e) {
-      console.error("Audio API not supported");
     }
   }
 
@@ -23,7 +25,6 @@ class AudioController {
     if (this.ctx && this.ctx.state === 'suspended') {
       this.ctx.resume().then(() => {
         // If we resumed and BGM was supposed to be playing (interval set), it will now become audible.
-        // If logic required restart, handled outside.
       });
     }
   }
@@ -34,16 +35,15 @@ class AudioController {
     // Handle BGM mute state immediate effect
     if (this.isMuted) {
       this.stopBGM();
-      if (window.speechSynthesis) window.speechSynthesis.cancel();
-    } else {
-      // If we are toggling unmute, caller might need to restart BGM if in menu, 
-      // but for simplicity we let the app logic handle "startBGM" calls.
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
     }
     return this.isMuted;
   }
 
   public speak(text: string) {
-    if (this.isMuted || !window.speechSynthesis) return;
+    if (this.isMuted || typeof window === 'undefined' || !window.speechSynthesis) return;
 
     // Cancel current speech to avoid queue buildup and lag
     window.speechSynthesis.cancel();
@@ -80,7 +80,9 @@ class AudioController {
 
   public stopBGM() {
     if (this.bgmInterval) {
-      window.clearInterval(this.bgmInterval);
+      if (typeof window !== 'undefined') {
+        window.clearInterval(this.bgmInterval);
+      }
       this.bgmInterval = null;
     }
   }
@@ -89,6 +91,7 @@ class AudioController {
     // Prevent multiple loops
     if (this.bgmInterval) return;
     if (!this.ctx) return;
+    if (typeof window === 'undefined') return;
 
     this.bgmNoteIndex = 0;
     
@@ -151,7 +154,6 @@ class AudioController {
   // --- SFX ---
 
   public playShoot() {
-    // Pew pew sound
     if (!this.ctx || this.isMuted) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -167,7 +169,6 @@ class AudioController {
   }
 
   public playExplosion() {
-    // Standard Enemy Kill: Retro Boom
     if (!this.ctx || this.isMuted) return;
 
     const duration = 0.3;
@@ -199,13 +200,11 @@ class AudioController {
   }
 
   public playGameOverExplosion() {
-    // Realistic/Heavy Explosion: Layered Noise + Sub-bass
     if (!this.ctx || this.isMuted) return;
 
     const t = this.ctx.currentTime;
     const duration = 2.0;
 
-    // Layer 1: Heavy Noise Blast
     const bufferSize = this.ctx.sampleRate * duration;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -218,10 +217,10 @@ class AudioController {
     const noiseFilter = this.ctx.createBiquadFilter();
     noiseFilter.type = 'lowpass';
     noiseFilter.frequency.setValueAtTime(1200, t);
-    noiseFilter.frequency.exponentialRampToValueAtTime(10, t + 1.5); // Deep sweep
+    noiseFilter.frequency.exponentialRampToValueAtTime(10, t + 1.5); 
 
     const noiseGain = this.ctx.createGain();
-    noiseGain.gain.setValueAtTime(1.0, t); // Loud impact
+    noiseGain.gain.setValueAtTime(1.0, t); 
     noiseGain.gain.exponentialRampToValueAtTime(0.01, t + 1.5);
 
     noise.connect(noiseFilter);
@@ -229,7 +228,6 @@ class AudioController {
     noiseGain.connect(this.ctx.destination);
     noise.start();
 
-    // Layer 2: Sub-bass Impact (Body of the explosion)
     const subOsc = this.ctx.createOscillator();
     subOsc.type = 'triangle';
     subOsc.frequency.setValueAtTime(150, t);
@@ -250,12 +248,10 @@ class AudioController {
   }
 
   public playMiss() {
-    // Low pitched buzzer "Bu-buu"
     if (!this.ctx || this.isMuted) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     osc.type = 'sawtooth';
-    // Lower frequency slide
     osc.frequency.setValueAtTime(120, this.ctx.currentTime);
     osc.frequency.linearRampToValueAtTime(60, this.ctx.currentTime + 0.4);
     
@@ -269,7 +265,6 @@ class AudioController {
   }
 
   public playError() {
-    // Short Error Buzzer
     if (!this.ctx || this.isMuted) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -285,7 +280,6 @@ class AudioController {
   }
 
   public playStart() {
-    // Power up sound
     if (!this.ctx || this.isMuted) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
@@ -302,16 +296,15 @@ class AudioController {
   }
 
   public playCountdownBeep() {
-    // "Pip" - Louder and higher pitch
     if (!this.ctx || this.isMuted) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     
     osc.type = 'square';
-    osc.frequency.setValueAtTime(880, this.ctx.currentTime); // Higher pitch (A5)
+    osc.frequency.setValueAtTime(880, this.ctx.currentTime);
     
-    gain.gain.setValueAtTime(0.2, this.ctx.currentTime); // Louder (0.2)
-    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15); // Slightly longer decay
+    gain.gain.setValueAtTime(0.2, this.ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.01, this.ctx.currentTime + 0.15);
     
     osc.connect(gain);
     gain.connect(this.ctx.destination);
@@ -321,16 +314,15 @@ class AudioController {
   }
 
   public playCountdownGo() {
-    // "Pooooon!" - Louder and stronger effect
     if (!this.ctx || this.isMuted) return;
     const osc = this.ctx.createOscillator();
     const gain = this.ctx.createGain();
     
     osc.type = 'square';
     osc.frequency.setValueAtTime(880, this.ctx.currentTime);
-    osc.frequency.linearRampToValueAtTime(1760, this.ctx.currentTime + 0.5); // Slide up to A6
+    osc.frequency.linearRampToValueAtTime(1760, this.ctx.currentTime + 0.5);
     
-    gain.gain.setValueAtTime(0.25, this.ctx.currentTime); // Louder (0.25)
+    gain.gain.setValueAtTime(0.25, this.ctx.currentTime); 
     gain.gain.linearRampToValueAtTime(0, this.ctx.currentTime + 0.5);
     
     osc.connect(gain);
