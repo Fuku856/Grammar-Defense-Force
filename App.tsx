@@ -172,26 +172,28 @@ const App: React.FC = () => {
                 </h1>
                 
                 {/* Japanese Subtitle */}
-                <h2 className="text-[#39FF14] text-xl md:text-2xl mb-4 tracking-[0.2em] font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
-                   文法防衛軍
-                </h2>
+                {!isEnglishOnly && (
+                  <h2 className="text-[#39FF14] text-xl md:text-2xl mb-4 tracking-[0.2em] font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
+                     文法防衛軍
+                  </h2>
+                )}
 
                 <p className="text-[#FF00FF] mb-6 text-sm md:text-base animate-pulse leading-relaxed">
                    Target the correct Part of Speech!<br/>
-                   <span className="text-xs md:text-sm opacity-90">正しい品詞を撃ち抜け！</span>
+                   {!isEnglishOnly && <span className="text-xs md:text-sm opacity-90">正しい品詞を撃ち抜け！</span>}
                 </p>
                 
                 <div className="flex flex-col gap-4 w-full max-w-[200px]">
                   <RetroButton 
                     label="START MISSION"
-                    subLabel="任務開始" 
+                    subLabel={isEnglishOnly ? undefined : "任務開始"} 
                     color="green" 
                     onClick={() => startGame(GameMode.NORMAL)}
                     className="w-full"
                   />
                   <RetroButton 
                     label="IMABARI MODE"
-                    subLabel="今治防衛戦" 
+                    subLabel={isEnglishOnly ? undefined : "今治防衛戦"} 
                     color="cyan" 
                     onClick={() => startGame(GameMode.IMABARI)}
                     className="w-full"
@@ -214,14 +216,14 @@ const App: React.FC = () => {
                 <div className="flex flex-col gap-4 w-full max-w-[200px]">
                   <RetroButton 
                     label="RETRY"
-                    subLabel="再挑戦" 
+                    subLabel={isEnglishOnly ? undefined : "再挑戦"} 
                     color="cyan" 
                     onClick={() => startGame(gameMode)} // Retry with same mode
                     className="w-full"
                   />
                   <RetroButton 
                     label="MAIN MENU"
-                    subLabel="メインメニュー" 
+                    subLabel={isEnglishOnly ? undefined : "メインメニュー"} 
                     color="pink" 
                     onClick={() => setGameState(GameState.MENU)}
                     className="w-full"
