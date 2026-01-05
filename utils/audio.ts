@@ -29,6 +29,16 @@ class AudioController {
     }
   }
 
+  public suspend() {
+    if (this.ctx && this.ctx.state === 'running') {
+      this.ctx.suspend();
+    }
+    // Cancel any ongoing speech
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }
+
   public toggleMute() {
     this.isMuted = !this.isMuted;
     

@@ -36,6 +36,26 @@ const App: React.FC = () => {
     };
   }, []);
 
+  // Handle Page Visibility (Pause audio/bgm when switching tabs/apps)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        audioController.stopBGM();
+        audioController.suspend();
+      } else {
+        audioController.resume();
+        if (gameState === GameState.MENU) {
+          audioController.playMenuBGM();
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [gameState]);
+
   // BGM Management
   useEffect(() => {
     if (gameState === GameState.MENU) {
@@ -147,22 +167,31 @@ const App: React.FC = () => {
           {/* Start Screen Overlay */}
           {gameState === GameState.MENU && (
              <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6 text-center z-30">
-                <h1 className="text-4xl md:text-5xl text-[#39FF14] mb-2 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] stroke-white">
+                <h1 className="text-4xl md:text-5xl text-[#39FF14] mb-1 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] stroke-white leading-tight">
                   GRAMMAR<br/>DEFENSE
                 </h1>
-                <p className="text-[#FF00FF] mb-8 text-sm md:text-base animate-pulse">
-                   Target the correct Part of Speech!
+                
+                {/* Japanese Subtitle */}
+                <h2 className="text-[#39FF14] text-xl md:text-2xl mb-4 tracking-[0.2em] font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
+                   文法防衛軍
+                </h2>
+
+                <p className="text-[#FF00FF] mb-6 text-sm md:text-base animate-pulse leading-relaxed">
+                   Target the correct Part of Speech!<br/>
+                   <span className="text-xs md:text-sm opacity-90">正しい品詞を撃ち抜け！</span>
                 </p>
                 
                 <div className="flex flex-col gap-4 w-full max-w-[200px]">
                   <RetroButton 
-                    label="START MISSION" 
+                    label="START MISSION"
+                    subLabel="任務開始" 
                     color="green" 
                     onClick={() => startGame(GameMode.NORMAL)}
                     className="w-full"
                   />
                   <RetroButton 
-                    label="IMABARI MODE" 
+                    label="IMABARI MODE"
+                    subLabel="今治防衛戦" 
                     color="cyan" 
                     onClick={() => startGame(GameMode.IMABARI)}
                     className="w-full"
@@ -184,13 +213,15 @@ const App: React.FC = () => {
                 </div>
                 <div className="flex flex-col gap-4 w-full max-w-[200px]">
                   <RetroButton 
-                    label="RETRY" 
+                    label="RETRY"
+                    subLabel="再挑戦" 
                     color="cyan" 
                     onClick={() => startGame(gameMode)} // Retry with same mode
                     className="w-full"
                   />
                   <RetroButton 
-                    label="MAIN MENU" 
+                    label="MAIN MENU"
+                    subLabel="メインメニュー" 
                     color="pink" 
                     onClick={() => setGameState(GameState.MENU)}
                     className="w-full"
@@ -230,24 +261,9 @@ const App: React.FC = () => {
               />
             </div>
           ) : (
-            /* Empty placeholder to keep layout stable or can be removed if buttons should gone completely. 
-               The prompt said "Hide controls on menu", so we render nothing, but we keep the container 
-               with padding to respect safe area if needed, or hide container. 
-               Actually, in previous code I hid the container entirely.
-               Let's stick to hiding the container entirely if menu, but wait,
-               I need to make sure the "Game Canvas Area" takes full height minus Header.
-               Flex-1 handles that.
-            */
             null
           )}
         </div>
-        {/* 
-           Correction: In the previous code, the container div itself was conditional.
-           Here I put the condition inside the div. 
-           But if the div is empty, it might still have padding/border.
-           Let's revert to wrapping the whole bottom div in condition like before,
-           but ensuring the safe-area padding is on that div.
-        */}
       </div>
     </div>
   );
