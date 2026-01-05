@@ -78,17 +78,17 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="relative w-full h-screen bg-neutral-900 flex justify-center items-center overflow-hidden">
+    <div className="relative w-full h-[100dvh] bg-neutral-900 flex justify-center items-center overflow-hidden">
       {/* Retro Container */}
       <div className="relative w-full h-full max-w-md bg-black shadow-2xl flex flex-col border-x-4 border-gray-800">
         
         {/* Header / HUD */}
-        <div className="h-16 bg-black border-b-4 border-white flex justify-between items-center px-4 shrink-0 z-20">
+        <div className="h-14 md:h-16 bg-black border-b-4 border-white flex justify-between items-center px-4 shrink-0 z-20">
           <div className="flex flex-col">
-             <span className="text-[#39FF14] text-xs uppercase tracking-widest">
+             <span className="text-[#39FF14] text-[10px] md:text-xs uppercase tracking-widest">
                {gameState === GameState.MENU ? 'HI-SCORE' : 'SCORE'}
              </span>
-             <span className="text-white text-xl leading-none">
+             <span className="text-white text-lg md:text-xl leading-none">
                {(gameState === GameState.MENU ? highScore : score).toString().padStart(6, '0')}
              </span>
           </div>
@@ -197,7 +197,10 @@ const App: React.FC = () => {
 
         {/* Controls Area */}
         {gameState !== GameState.MENU && (
-          <div className="h-auto pb-6 pt-2 px-2 bg-black border-t-4 border-white shrink-0 z-20">
+          <div 
+            className="h-auto pt-2 px-2 bg-black border-t-4 border-white shrink-0 z-20"
+            style={{ paddingBottom: 'max(1.5rem, env(safe-area-inset-bottom))' }}
+          >
             <div className="grid grid-cols-3 gap-2 md:gap-4 max-w-sm mx-auto">
               <RetroButton 
                 label="NOUN" 
