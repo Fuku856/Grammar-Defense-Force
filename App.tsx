@@ -103,17 +103,17 @@ const App: React.FC = () => {
 
   return (
     // Use h-screen as base, override with 100dvh via style for better mobile support
-    <div className="relative w-full h-screen bg-neutral-900 flex justify-center items-center overflow-hidden select-none" style={{ height: '100dvh' }}>
+    <div className="relative w-full h-screen bg-neutral-900 flex justify-center items-center overflow-hidden select-none cursor-default" style={{ height: '100dvh' }}>
       {/* Retro Container */}
       <div className="relative w-full h-full max-w-md bg-black shadow-2xl flex flex-col border-x-4 border-gray-800">
         
         {/* Header / HUD */}
         <div className="h-14 md:h-16 bg-black border-b-4 border-white flex justify-between items-center px-4 shrink-0 z-20">
           <div className="flex flex-col">
-             <span className="text-[#39FF14] text-[10px] md:text-xs uppercase tracking-widest">
+             <span className="text-[#39FF14] text-[10px] md:text-xs uppercase tracking-widest pointer-events-none">
                {gameState === GameState.MENU ? 'HI-SCORE' : 'SCORE'}
              </span>
-             <span className="text-white text-lg md:text-xl leading-none">
+             <span className="text-white text-lg md:text-xl leading-none pointer-events-none">
                {(gameState === GameState.MENU ? highScore : score).toString().padStart(6, '0')}
              </span>
           </div>
@@ -166,19 +166,19 @@ const App: React.FC = () => {
 
           {/* Start Screen Overlay */}
           {gameState === GameState.MENU && (
-             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6 text-center z-30 select-none">
-                <h1 className="text-4xl md:text-5xl text-[#39FF14] mb-1 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] stroke-white leading-tight">
+             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6 text-center z-30 select-none cursor-default">
+                <h1 className="text-4xl md:text-5xl text-[#39FF14] mb-1 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] stroke-white leading-tight pointer-events-none">
                   GRAMMAR<br/>DEFENSE
                 </h1>
                 
                 {/* Japanese Subtitle */}
                 {!isEnglishOnly && (
-                  <h2 className="text-[#39FF14] text-xl md:text-2xl mb-4 tracking-[0.2em] font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,1)]">
+                  <h2 className="text-[#39FF14] text-xl md:text-2xl mb-4 tracking-[0.2em] font-bold drop-shadow-[2px_2px_0_rgba(0,0,0,1)] pointer-events-none">
                      文法防衛軍
                   </h2>
                 )}
 
-                <p className="text-[#FF00FF] mb-6 text-sm md:text-base animate-pulse leading-relaxed">
+                <p className="text-[#FF00FF] mb-6 text-sm md:text-base animate-pulse leading-relaxed pointer-events-none">
                    Target the correct Part of Speech!<br/>
                    {!isEnglishOnly && <span className="text-xs md:text-sm opacity-90">正しい品詞を撃ち抜け！</span>}
                 </p>
@@ -204,9 +204,9 @@ const App: React.FC = () => {
 
           {/* Game Over Overlay */}
           {gameState === GameState.GAME_OVER && (
-             <div className="absolute inset-0 bg-red-900/40 flex flex-col items-center justify-center p-6 text-center z-30 select-none">
-                <h2 className="text-5xl text-[#FF3333] mb-4">GAME OVER</h2>
-                <div className="mb-8">
+             <div className="absolute inset-0 bg-red-900/40 flex flex-col items-center justify-center p-6 text-center z-30 select-none cursor-default">
+                <h2 className="text-5xl text-[#FF3333] mb-4 pointer-events-none">GAME OVER</h2>
+                <div className="mb-8 pointer-events-none">
                   <p className="text-white">FINAL SCORE</p>
                   <p className="text-3xl text-[#00FFFF]">{score}</p>
                   {score >= highScore && score > 0 && (

@@ -9,14 +9,21 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=DotGothic16&display=swap" rel="stylesheet">
     <style>
+      /* Globally disable selection and touch callouts */
+      *, *::before, *::after {
+        -webkit-user-select: none; /* Safari */
+        -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* IE10+/Edge */
+        user-select: none; /* Standard */
+        -webkit-touch-callout: none; /* iOS Safari */
+      }
+
       body {
         font-family: 'DotGothic16', sans-serif;
         background-color: #050505;
         color: #e0e0e0;
         overflow: hidden; /* Prevent scrolling on mobile */
         touch-action: none;
-        -webkit-user-select: none; /* Safari */
-        user-select: none; /* Standard syntax */
       }
       .pixelated {
         image-rendering: pixelated;
