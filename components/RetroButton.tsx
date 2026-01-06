@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ButtonHTMLAttributes } from 'react';
 
 interface RetroButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   color?: 'green' | 'pink' | 'cyan' | 'red';
@@ -25,7 +25,7 @@ export const RetroButton: React.FC<RetroButtonProps> = ({
       className={`
         relative group border-2 md:border-4 px-2 py-2 md:py-4 
         font-bold uppercase transition-all duration-75 active:translate-y-1
-        flex flex-col items-center justify-center leading-none
+        flex flex-col items-center justify-center leading-none select-none
         ${colorClasses[color]}
         ${className}
       `}

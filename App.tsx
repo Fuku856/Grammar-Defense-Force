@@ -103,7 +103,7 @@ const App: React.FC = () => {
 
   return (
     // Use h-screen as base, override with 100dvh via style for better mobile support
-    <div className="relative w-full h-screen bg-neutral-900 flex justify-center items-center overflow-hidden" style={{ height: '100dvh' }}>
+    <div className="relative w-full h-screen bg-neutral-900 flex justify-center items-center overflow-hidden select-none" style={{ height: '100dvh' }}>
       {/* Retro Container */}
       <div className="relative w-full h-full max-w-md bg-black shadow-2xl flex flex-col border-x-4 border-gray-800">
         
@@ -166,7 +166,7 @@ const App: React.FC = () => {
 
           {/* Start Screen Overlay */}
           {gameState === GameState.MENU && (
-             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6 text-center z-30">
+             <div className="absolute inset-0 bg-black/80 flex flex-col items-center justify-center p-6 text-center z-30 select-none">
                 <h1 className="text-4xl md:text-5xl text-[#39FF14] mb-1 drop-shadow-[4px_4px_0_rgba(0,0,0,1)] stroke-white leading-tight">
                   GRAMMAR<br/>DEFENSE
                 </h1>
@@ -204,7 +204,7 @@ const App: React.FC = () => {
 
           {/* Game Over Overlay */}
           {gameState === GameState.GAME_OVER && (
-             <div className="absolute inset-0 bg-red-900/40 flex flex-col items-center justify-center p-6 text-center z-30">
+             <div className="absolute inset-0 bg-red-900/40 flex flex-col items-center justify-center p-6 text-center z-30 select-none">
                 <h2 className="text-5xl text-[#FF3333] mb-4">GAME OVER</h2>
                 <div className="mb-8">
                   <p className="text-white">FINAL SCORE</p>
