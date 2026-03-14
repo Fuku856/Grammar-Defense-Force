@@ -7,6 +7,10 @@ class AudioController {
   private bgmInterval: number | null = null;
   private bgmNoteIndex: number = 0;
 
+  // Speech State
+  private currentUtterance: SpeechSynthesisUtterance | null = null;
+  private voicesLoaded: boolean = false;
+
   constructor() {
     // Safety check for SSR/Build environments where window is undefined
     if (typeof window !== 'undefined') {
@@ -17,6 +21,16 @@ class AudioController {
         }
       } catch (e) {
         console.error("Audio API not supported");
+      }
+
+      // Handle voice loading delay
+      if (window.speechSynthesis) {
+        if (window.speechSynthesis.getVoices().length > 0) {
+          this.voicesLoaded = true;
+        }
+        window.speechSynthesis.onvoiceschanged = () => {
+          this.voicesLoaded = true;
+        };
       }
     }
   }
@@ -57,12 +71,50 @@ class AudioController {
 
     // Cancel current speech to avoid queue buildup and lag
     window.speechSynthesis.cancel();
+    
+    // Clear previous utterance reference
+    this.currentUtterance = null;
 
     const utterance = new SpeechSynthesisUtterance(text);
     utterance.lang = 'en-US'; // Ensure English pronunciation
     utterance.rate = 1.0;     // Normal speed
     utterance.pitch = 1.0;    // Normal pitch
     utterance.volume = 1.0;
+
+    // Keep reference to prevent GC
+    this.currentUtterance = utterance;
+
+    utterance.onend = () => {
+      this.currentUtterance = null;
+    };
+
+    utterance.onerror = (event) => {
+      console.error("Speech Synthesis Error:", event);
+      this.currentUtterance = null;
+    };
+
+    window.speechSynthesis.speak(utterance);
+  }
+
+  /**
+   * Warm up the speech engine on user interaction.
+   * This is crucial for mobile browsers (iOS Safari) to unlock speech synthesis.
+   */
+  public warmUpSpeech() {
+    if (typeof window === 'undefined' || !window.speechSynthesis || this.isMuted) return;
+
+    // If voices aren't loaded yet, try to trigger loading
+    if (!this.voicesLoaded) {
+      window.speechSynthesis.getVoices();
+    }
+
+    // Speak a tiny silent text to "unlock" the engine
+    const utterance = new SpeechSynthesisUtterance('');
+    utterance.volume = 0;
+    utterance.rate = 10; // Fast as possible
+    
+    // Some browsers need a tiny bit of content
+    // utterance.text = ' '; 
 
     window.speechSynthesis.speak(utterance);
   }

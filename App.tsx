@@ -27,6 +27,7 @@ const App: React.FC = () => {
   useEffect(() => {
     const handleInteraction = () => {
       audioController.resume();
+      audioController.warmUpSpeech();
     };
     window.addEventListener('click', handleInteraction);
     window.addEventListener('touchstart', handleInteraction);
